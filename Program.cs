@@ -14,17 +14,25 @@ class Program
     static void ModifyArray()
     {
         Console.WriteLine("Модификация потока(первый поток)...");
-        for (int i = 0; i < dataArray.Length; i++)
+        try 
         {
-           Thread.Sleep(399);
-           int randomNumber = random.Next(1, 11);
-           dataArray[i] += randomNumber;
+            mutex.WaitOne();
+            for (int i = 0; i < dataArray.Length; i++)
+            {
+                Thread.Sleep(399);
+                int randomNumber = random.Next(1, 11);
+                dataArray[i] += randomNumber;
+            }
+            Console.WriteLine($"Модификация потока: {string.Join(", ", dataArray)}");
+
+            Console.WriteLine("Модификация окончена.");
+            Task.Run(() => FindMaxAndDisplay());
         }
-        Console.WriteLine($"Модификация потока: {string.Join(", ", dataArray)}");
 
-
-        Console.WriteLine("Модификация окончена.");
-        Task.Run(() => FindMaxAndDisplay());
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
 
     }
 
